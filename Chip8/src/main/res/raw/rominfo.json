@@ -1,0 +1,31 @@
+[
+  {
+    "name" : "Connect 4",
+    "filename" : "connect4.rom",
+    "keyMap" : [ 4, 5, 6 ]
+  },
+
+  {
+    "name" : "Space Invaders",
+    "filename" : "invaders.rom",
+    "keyMap" : [ 4, 5, 6 ]
+  },
+
+  {
+    "name" : "Brix",
+    "filename" : "brix.rom",
+    "keyMap" : [ 4, 6 ]
+  },
+
+  {
+    "name" : "Breakout",
+    "filename" : "breakout.rom",
+    "keyMap" : [ 4, 6 ]
+  },
+
+  {
+    "name" : "Tetris",
+    "filename" : "tetris.rom",
+    "keyMap" : [ 4, 5, 6, 7 ]
+  }
+]
