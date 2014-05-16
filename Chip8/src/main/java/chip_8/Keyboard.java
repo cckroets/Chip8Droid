@@ -34,27 +34,24 @@ public class Keyboard extends HardwareAdapter
     return keys.get(key);
   }
 
-  private void handleKeyEvent(char key, boolean pressRelease) {
-
-    if ((key >= '0') && (key <= '9')) {
-      keys.set(key - '0',pressRelease);
-    } else if ((key >= 'a') && (key <= 'f')) {
-      keys.set(key - 'a' + 0xA, pressRelease);
-    }
+  private void handleKeyEvent(int button, boolean pressRelease)
+  {
+    int key = keyMap[button];
+    keys.set(key,pressRelease);
   }
 
 
-  public void keyPressed(char event)
+  public void keyPressed(int button)
   {
     // Key was pressed
-    handleKeyEvent(event, true);
+    handleKeyEvent(button, true);
   }
 
 
-  public void keyReleased(char event)
+  public void keyReleased(int button)
   {
     // Key was released
-    handleKeyEvent(event,false);
+    handleKeyEvent(button,false);
   }
 
   public void release(int key)

@@ -5,6 +5,8 @@ import Emulation.CPU;
 import Emulation.Hardware;
 import Emulation.Rom;
 import com.google.common.collect.Lists;
+
+import java.security.Key;
 import java.util.Collection;
 
 
@@ -19,10 +21,9 @@ public class Chip8Processor implements CPU
   public static final int PIXEL_WIDTH = 64;
   public static final int PIXEL_HEIGHT = 32;
 
-  private Display   display  = null;
-  private Registers reg      = new Registers();
-  private Keyboard  keyboard;
-  private Memory    memory   = new Memory();
+  private Registers reg = new Registers();
+  private Keyboard keyboard;
+  private Memory memory = new Memory();
   private Collection<Hardware> componentList;
   private BinaryBitmap bmap = BinaryBitmap.newBitmap1D(PIXEL_WIDTH,PIXEL_HEIGHT);
 
@@ -39,19 +40,12 @@ public class Chip8Processor implements CPU
     componentList = Lists.newArrayList(reg,memory,bmap);
   }
 
-  public void setDisplay(Display d)
-  {
-    bmap.deleteObserver(this.display);
-    this.display = d;
-    bmap.addObserver(this.display);
-  }
-
   @Override
   public void loadRom(Rom rom)
   {
     Chip8Rom chip8Rom = (Chip8Rom) rom;
     keyboard = chip8Rom.getKeyboard();
-    memory.loadBytes(chip8Rom.getBytes(),START_OF_PROGRAM);
+    memory.loadBytes(chip8Rom.getBytes(), START_OF_PROGRAM);
   }
 
 
@@ -69,7 +63,7 @@ public class Chip8Processor implements CPU
   @Override
   public void executeCycle()
   {
-    /* Read instruction*/
+    /* Read instruction */
     short instr = memory.readInstruction(reg.pc);
     /* Update PC */
     reg.pc += 2;
@@ -82,7 +76,7 @@ public class Chip8Processor implements CPU
   /* Wait for Clock Cycle to end */
   private void sleep() {
     try {
-      Thread.sleep(2);
+      Thread.sleep(1);
     } catch(InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
@@ -101,64 +95,64 @@ public class Chip8Processor implements CPU
       case 0x0000:
         if (instr == 0x00E0) {
           bmap.clear();
-          log.name("CLS");
+          //log.name("CLS");
         }
         else if (instr == 0x00EE) {
           reg.ret();
-          log.name("RET");
+          //log.name("RET");
         }
         break;
       case 0x1000:
         reg.pc = (short)nnn;
-        log.instrAddr("JP", nnn);
+        //log.instrAddr("JP", nnn);
         break;
       case 0x2000:
         reg.call(nnn);
-        log.instrAddr("CALL", nnn);
+        //log.instrAddr("CALL", nnn);
         break;
       case 0x3000:
         se(x,kk);
-        log.instrRegAddr("SE", x, kk);
+        //log.instrRegAddr("SE", x, kk);
         break;
       case 0x4000:
         sne(x,kk);
-        log.instrRegAddr("SNE", x, kk);
+        //log.instrRegAddr("SNE", x, kk);
         break;
       case 0x5000:
         se(x,reg.v(y));
-        log.instrRegReg("SE", x, y);
+        //log.instrRegReg("SE", x, y);
         break;
       case 0x6000:
         reg.setVx(x, kk);
-        log.instrRegAddr("LD", x, kk);
+        //log.instrRegAddr("LD", x, kk);
         break;
       case 0x7000:
         reg.setVx(x, reg.v(x) + kk);
-        log.instrRegAddr("ADD", x, kk);
+        //log.instrRegAddr("ADD", x, kk);
         break;
       case 0x8000:
         dispatchALU(x, y, instr & 0x000F);
         break;
       case 0x9000:
         sne(x,reg.v(y));
-        log.instrRegReg("SNE", x, y);
+        //log.instrRegReg("SNE", x, y);
         break;
       case 0xA000:
         reg.i = nnn;
-        log.instrRegAddr("LD", "I", nnn);
+        //log.instrRegAddr("LD", "I", nnn);
         break;
       case 0xB000:
         reg.pc = (nnn + reg.v(0));
-        log.instrRegAddr("JP", 0, nnn);
+        //log.instrRegAddr("JP", 0, nnn);
         break;
       case 0xC000:
         int rand = (int)(Math.random() * 255);
         reg.setVx(x, rand & kk);
-        log.instrRegAddr("RND", x, kk);
+        //log.instrRegAddr("RND", x, kk);
         break;
       case 0xD000:
         draw(reg.v(x), reg.v(y), (instr & 0x000F));
-        log.instrRegRegAddr("DRW", x, y, (instr & 0x000F));
+        //log.instrRegRegAddr("DRW", x, y, (instr & 0x000F));
         break;
       case 0xE000:
         boolean skp_if_pressed = (instr & 1) == 0;
@@ -166,8 +160,8 @@ public class Chip8Processor implements CPU
           keyboard.release(reg.v(x));
           reg.pc += 2;
         }
-        String op = (kk == 0x9E) ? "SKP" : "SKNP";
-        log.instrReg(op, x);
+        //String op = (kk == 0x9E) ? "SKP" : "SKNP";
+        //log.instrReg(op, x);
         break;
       case 0xF000:
         dispatchLD(x, kk);
@@ -199,40 +193,40 @@ public class Chip8Processor implements CPU
         break;
       case 1:
         result = (vX | vY);
-        log.instrRegReg("OR", x, y);
+        //log.instrRegReg("OR", x, y);
         break;
       case 2:
         result = (vX & vY);
-        log.instrRegReg("AND", x, y);
+        //log.instrRegReg("AND", x, y);
         break;
       case 3:
         result = (vX ^ vY);
-        log.instrRegReg("XOR", x, y);
+        //log.instrRegReg("XOR", x, y);
         break;
       case 4:
         result = (vX + vY);
         reg.setVF(result > 0xFF);
-        log.instrRegReg("ADD", x, y);
+        //log.instrRegReg("ADD", x, y);
         break;
       case 5:
         reg.setVF(vX > vY);
         result = (vX - vY);
-        log.instrRegReg("SUB", x, y);
+        //log.instrRegReg("SUB", x, y);
         break;
       case 6:
         reg.setVF((vX & 1) == 1);
         result = (vX >> 1);
-        log.instrRegReg("SHR", x, y);
+        //log.instrRegReg("SHR", x, y);
         break;
       case 7:
         reg.setVF(vY > vX);
         result = (vY - vX);
-        log.instrRegReg("SUBN", x, y);
+        //log.instrRegReg("SUBN", x, y);
         break;
       case 0xE:
         reg.setVF((vX & 0x80) != 0);
         result = (vX << 1);
-        log.instrRegReg("SHL", x, y);
+        //log.instrRegReg("SHL", x, y);
         break;
     }
     reg.setVx(x, result);
@@ -243,7 +237,7 @@ public class Chip8Processor implements CPU
     switch (opcode) {
       case 0x07:
         reg.setVx(x, reg.dt);
-        log.instrRegReg("LD", x, "DT");
+        //log.instrRegReg("LD", x, "DT");
         break;
       case 0x0A:
         byte k = (byte)keyboard.waitForPress();
@@ -254,35 +248,35 @@ public class Chip8Processor implements CPU
         }
         reg.setVx(x, k);
         keyboard.release(k);
-        log.instrRegReg("LD", x, "K");
+        //log.instrRegReg("LD", x, "K");
         break;
       case 0x15:
         reg.dt = reg.v(x);
-        log.instrRegReg("LD", "DT", x);
+        //log.instrRegReg("LD", "DT", x);
         break;
       case 0x18:
         reg.st = reg.v(x);
-        log.instrRegReg("LD", "ST", x);
+        //log.instrRegReg("LD", "ST", x);
         break;
       case 0x1E:
         reg.i += (0xFF & reg.v(x));
-        log.instrRegReg("ADD", "I", x);
+        //log.instrRegReg("ADD", "I", x);
         break;
       case 0x29:
         reg.i = (reg.v(x) & 0x0F) * SPRITE_LENGTH;
-        log.instrRegReg("LD", "F", x);
+        //log.instrRegReg("LD", "F", x);
         break;
       case 0x33:
         memory.storeBCD(reg.v(x), reg.i);
-        log.instrRegReg("LD", "B", x);
+        //log.instrRegReg("LD", "B", x);
         break;
       case 0x55:
         memory.store(x, reg);
-        log.instrRegReg("LD", "[I]", x);
+        //log.instrRegReg("LD", "[I]", x);
         break;
       case 0x65:
         memory.load(x, reg);
-        log.instrRegReg("LD", x, "[I]");
+        //log.instrRegReg("LD", x, "[I]");
         break;
     }
   }
@@ -291,9 +285,9 @@ public class Chip8Processor implements CPU
   public void draw(int vx, int vy, int height)
   {
     vx &= 0xFF;
-    log.dumpI();
-    log.dumpSprite(height);
-    log.dumpAllReg();
+    //log.dumpI();
+    //log.dumpSprite(height);
+    //log.dumpAllReg();
     if ( vy < 0) vy += PIXEL_HEIGHT;
     int y = vy % PIXEL_HEIGHT;
     boolean collision = false;
@@ -315,4 +309,6 @@ public class Chip8Processor implements CPU
   }
 
   public BinaryBitmap getBitmap() { return bmap; }
+
+  public Keyboard getKeyboard() { return keyboard; }
 }

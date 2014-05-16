@@ -2,45 +2,31 @@ package chip_8;
 
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 
 import com.ckroetsch.chip8.Chip8Application;
-
-import Emulation.Screen.ImageScalingAlgorithm;
-import Emulation.Screen.ImageScalingFactory;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
 
 /**
  * @author ckroetsc
  */
-public class Display extends SurfaceView implements Observer, SurfaceHolder.Callback, View.OnTouchListener
+public class Display extends SurfaceView implements SurfaceHolder.Callback
 {
-  private int WIDTH = 64;
-  private int HEIGHT = 32;
+  private final int WIDTH = 64;
+  private final int HEIGHT = 32;
+  private final int EDGE_OFFSET = 5;
 
-  public static int FOREGROUND_COLOR = Color.CYAN;
-  public static int BACKGROUND_COLOR = Color.DKGRAY;
+  public static int FOREGROUND_COLOR = Color.BLACK;
+  public static int BACKGROUND_COLOR = Color.LTGRAY;
 
   private BinaryBitmap bitmapModel = null;
-  private Bitmap bmap = null;
   private Paint paint = null;
-  private GameThread thread = null;
-
-
-
+  private RenderThread thread = null;
 
   public Display(Context context)
   {
@@ -66,152 +52,74 @@ public class Display extends SurfaceView implements Observer, SurfaceHolder.Call
     getHolder().addCallback(this);
     setFocusable(true);
     Chip8Processor cpu = Chip8Application.getCPU();
-    cpu.setDisplay(this);
     this.bitmapModel = cpu.getBitmap();
     this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    setOnTouchListener(this);
   }
 
-/*
-  @Override
-  public synchronized void paint(Graphics g) {
-    Graphics2D g2 = (Graphics2D) g;
-    int scaleFactor = upscaleAlg.getScaleFactor();
-    int scaledTileSize = tileSize / scaleFactor;
-
-    g2.setColor(BACKGROUND_COLOR);
-    g2.fillRect(0,0, tileSize * tilesAcross, tileSize * tilesDown);
-    g2.setColor(FOREGROUND_COLOR);
-
-    int pixelOnLength = 0;
-
-    for (int y=0; y < _bitmapUpscaled.getHeight(); y++) {
-      for (int x=0; x < _bitmapUpscaled.getWidth(); x++) {
-        if (_bitmapUpscaled.get(x,y)) {
-          pixelOnLength++;
-        } else {
-          drawLine(g2, x - pixelOnLength, y, pixelOnLength, scaledTileSize);
-          pixelOnLength = 0;
-        }
-      }
-      drawLine(g2, _bitmapUpscaled.getWidth() - pixelOnLength, y, pixelOnLength, scaledTileSize);
-      pixelOnLength = 0;
-    }
-  }
-
-  private void drawLine(Graphics2D g2, int x, int y, int width, int scale)
-  {
-    if (width > 0) {
-      g2.fillRect(x * scale, y * scale, scale * width, scale);
-    }
-  }
-
-  public Display(Chip8Processor cpu)
-  {
-    this._bitmapModel = cpu.getBitmap();
-    this._bitmapUpscaled = _bitmapModel.genEmptyAndScaled(upscaleAlg.getScaleFactor());
-    this.tilesAcross = Chip8Processor.PIXEL_WIDTH;
-    this.tilesDown = Chip8Processor.PIXEL_HEIGHT;
-    cpu.setDisplay(this);
-
-    this.setPreferredSize(new Dimension(tilesAcross * tileSize, tilesDown * tileSize));
-    this.setFocusable(true);
-    this.addKeyListener(new KeyAdapter()
-    {
-      @Override
-      public void keyPressed(KeyEvent keyEvent)
-      {
-        if (keyEvent.getKeyChar() == 'n')
-        {
-          algIndex = (algIndex + 1) % algorithms.size();
-          setUpscaleAlgorithm(algorithms.get(algIndex));
-        } else if (keyEvent.getKeyChar() == 'm')
-        {
-          algIndex--;
-          algIndex = (algIndex == -1) ? algorithms.size()-1 : algIndex;
-          setUpscaleAlgorithm(algorithms.get(algIndex));
-        }
-      }
-    });
-  } */
-
-  public void startGame()
+  public void start()
   {
     if (thread == null)
     {
-      thread = new GameThread(this);
+      thread = new RenderThread(this);
       thread.startThread();
     }
   }
 
-  @Override
-  public void update(Observable observable, Object o)
+  public void stop()
   {
+    if (thread != null) {
+      thread.stopThread();
+    }
   }
 
   @Override
-  public void surfaceCreated(SurfaceHolder surfaceHolder)
-  {
-
-  }
+  public void surfaceCreated(SurfaceHolder surfaceHolder) { }
 
   @Override
-  public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3)
-  {
-
-  }
+  public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) { }
 
   @Override
-  public void surfaceDestroyed(SurfaceHolder surfaceHolder)
-  {
+  public void surfaceDestroyed(SurfaceHolder surfaceHolder) { }
 
-  }
 
   @Override
   protected void onDraw(Canvas canvas)
   {
     paint.setColor(BACKGROUND_COLOR);
     canvas.drawRect(0,0,Chip8Application.SCREEN_WIDTH,Chip8Application.SCREEN_HEIGHT,paint);
-    float sizeFactor = Chip8Application.SCREEN_WIDTH / 64;
-    Log.d("DISPLAY", "DRAW");
+    float sizeFactor = Chip8Application.SCREEN_WIDTH / WIDTH;
     paint.setColor(FOREGROUND_COLOR);
+
+    float x1, x2, y1, y2;
     for (int x=0; x < WIDTH; x++) {
       for (int y=0; y < HEIGHT; y++) {
         boolean on = bitmapModel.get(x,y);
         if (on) {
-          float x1 = x * sizeFactor;
-          float x2 = x1 + sizeFactor;
-          float y1 = y * sizeFactor;
-          float y2 = y1 + sizeFactor;
+          x1 = x * sizeFactor + EDGE_OFFSET;
+          x2 = x1 + sizeFactor;
+          y1 = y * sizeFactor + EDGE_OFFSET;
+          y2 = y1 + sizeFactor;
           canvas.drawRect(x1,y1,x2,y2,paint);
         }
       }
     }
-
-  }
-
-
-  @Override
-  public boolean onTouch(View view, MotionEvent motionEvent)
-  {
-    this.invalidate();
-    return true;
   }
 }
 
- class GameThread extends Thread
+class RenderThread extends Thread
 {
-  private final static int SLEEP_TIME = 40;
+  private final static int FRAMES_PER_SECOND = 50;
+  private final static int SLEEP_TIME = 1000 / FRAMES_PER_SECOND;
 
   private boolean running = false;
-  private Display canvas = null;
+  private Display display = null;
   private SurfaceHolder surfaceHolder = null;
 
-  public GameThread(Display canvas)
+  public RenderThread(Display display)
   {
     super();
-    this.canvas = canvas;
-    this.surfaceHolder = canvas.getHolder();
+    this.display = display;
+    this.surfaceHolder = display.getHolder();
   }
 
   public void startThread()
@@ -227,7 +135,7 @@ public class Display extends SurfaceView implements Observer, SurfaceHolder.Call
 
   public void run()
   {
-    Canvas c = null;
+    Canvas c;
     while (running)
     {
       c = null;
@@ -238,14 +146,12 @@ public class Display extends SurfaceView implements Observer, SurfaceHolder.Call
         {
           if (c != null)
           {
-            canvas.onDraw(c);
+            display.onDraw(c);
           }
         }
         sleep(SLEEP_TIME);
       }
-      catch(InterruptedException ie)
-      {
-      }
+      catch(InterruptedException ie) { }
       finally
       {
         // do this in a finally so that if an exception is thrown
