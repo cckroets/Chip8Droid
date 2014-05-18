@@ -1,10 +1,8 @@
 package chip_8.android;
 
 import android.media.MediaPlayer;
-
 import com.ckroetsch.chip8.Chip8Application;
 import com.ckroetsch.chip8.R;
-
 import chip_8.SoundChip;
 
 /**
@@ -12,27 +10,28 @@ import chip_8.SoundChip;
  */
 public class BeepSoundChip implements SoundChip
 {
-  private boolean enabled = true;
-  private MediaPlayer player = MediaPlayer.create(Chip8Application.getContext(), R.raw.beep);
-
+  private MediaPlayer player = MediaPlayer.create(Chip8Application.getContext(), R.raw.buzz);
 
   @Override
   public void play()
   {
-    if (enabled && ! player.isPlaying())
+    if (! player.isPlaying()) {
       player.start();
+    }
   }
 
   @Override
   public void stop()
   {
-    if (player.isPlaying()) player.pause();
+    if (player.isPlaying()) {
+      player.pause();
+    }
   }
 
   @Override
-  public void setEnabled(boolean enabled)
+  public void quit()
   {
-    this.enabled = enabled;
+    player.release();
   }
 
 }

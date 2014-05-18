@@ -7,14 +7,17 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
 import com.ckroetsch.chip8.Chip8Application;
 
+import Emulation.Screen.Bitmap;
 import chip_8.BinaryBitmap;
-import chip_8.Chip8Processor;
 import chip_8.Display;
 
 /**
@@ -59,16 +62,24 @@ public class AndroidDisplay extends SurfaceView implements SurfaceHolder.Callbac
   {
     getHolder().addCallback(this);
     setFocusable(true);
-    Chip8Processor cpu = Chip8Application.getCPU();
-    this.bitmapModel = cpu.getBitmap();
+    //setDimensions(context);
     this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+  }
 
-    context.getSystemService(Context.WINDOW_SERVICE);
-    Point p = new Point();
+  private void setDimensions(Context context)
+  {
     WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    windowManager.getDefaultDisplay().getSize(p);
-    SCREEN_WIDTH = p.x;
-    SCREEN_HEIGHT = p.y;
+    android.view.Display display = windowManager.getDefaultDisplay();
+    Point dimension = new Point();
+    display.getSize(dimension);
+    SCREEN_WIDTH = dimension.x;
+    SCREEN_HEIGHT = dimension.y;
+  }
+
+  @Override
+  public void setBitmap(Bitmap bmap)
+  {
+    this.bitmapModel = (BinaryBitmap) bmap;
   }
 
   @Override
@@ -91,10 +102,15 @@ public class AndroidDisplay extends SurfaceView implements SurfaceHolder.Callbac
   }
 
   @Override
-  public void surfaceCreated(SurfaceHolder surfaceHolder) { }
+  public void surfaceCreated(SurfaceHolder surfaceHolder)
+  {
+  }
 
   @Override
-  public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) { }
+  public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3)
+  {
+    setDimensions(Chip8Application.getContext());
+  }
 
   @Override
   public void surfaceDestroyed(SurfaceHolder surfaceHolder) { }

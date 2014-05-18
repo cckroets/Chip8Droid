@@ -1,5 +1,7 @@
-package chip_8;
+package chip_8.android;
 
+
+import com.ckroetsch.chip8.R;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -7,7 +9,8 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import chip_8.android.IOUtil;
+import chip_8.Chip8Rom;
+import chip_8.Utils;
 
 
 /**
@@ -15,9 +18,18 @@ import chip_8.android.IOUtil;
  */
 public class RomFactory
 {
-  private Map<String,Chip8Rom> romConf;
+  private static RomFactory instance = null;
 
-  public RomFactory()
+  public static RomFactory get()
+  {
+    if (instance == null)
+      instance = new RomFactory();
+    return instance;
+  }
+
+  private Map<String, Chip8Rom> romConf;
+
+  private RomFactory()
   {
     this.romConf = readRomConfig();
   }
@@ -25,7 +37,7 @@ public class RomFactory
   private static Map<String,Chip8Rom> readRomConfig()
   {
     Map<String,Chip8Rom> romMap = new HashMap<String, Chip8Rom>();
-    InputStream in = IOUtil.openRomConfig();
+    InputStream in = IOUtil.openRawResource(R.raw.rominfo);
     try {
         byte[] res = Utils.streamToBytes(in);
         String json = new String(res, "UTF-8");

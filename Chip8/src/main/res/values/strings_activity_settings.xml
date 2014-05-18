@@ -1,0 +1,23 @@
+<resources>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+
+    <string name="pref_sound_title">Sound Feedback</string>
+    <string name="pref_sound_key">sound_feedback</string>
+    <string-array name="pref_sound_entries">
+        <item>Audio</item>
+        <item>Vibration</item>
+        <item>None</item>
+    </string-array>
+    <string-array name="pref_sound_values">
+        <item>2</item>
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+
+</resources>

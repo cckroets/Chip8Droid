@@ -10,5 +10,7 @@ public interface SoundChip
 
   public void stop();
 
-  public void setEnabled(boolean enabled);
+  public void quit();
+
+
 }

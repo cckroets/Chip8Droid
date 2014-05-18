@@ -13,8 +13,6 @@ import Emulation.Rom;
  */
 public class AndroidEmulatorListener implements ActionListener
 {
-  private Toast toast = Toast.makeText(Chip8Application.getContext(),"",Toast.LENGTH_SHORT);
-
   @Override
   public void onLoad(Rom rom, boolean found)
   {
@@ -29,7 +27,6 @@ public class AndroidEmulatorListener implements ActionListener
 
   public void showToast(int id)
   {
-    toast.setText(id);
-    toast.show();
+    Toast.makeText(Chip8Application.getContext(),id,Toast.LENGTH_SHORT).show();
   }
 }

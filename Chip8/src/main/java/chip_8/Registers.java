@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author ckroetsc
@@ -39,7 +40,12 @@ public class Registers implements Hardware
   /* Sound Timer. Same as DT, but buzzes when non-zero */
   public int st;
 
-  private SoundChip soundChip = new BeepSoundChip();
+  private AtomicReference<SoundChip> soundChip = new AtomicReference<SoundChip>(null);
+
+  public void setSoundChip(SoundChip chip)
+  {
+    soundChip.set(chip);
+  }
 
   /* Timers work at 60Hz. Convert to ms. */
   private static int TIMER_PERIOD = 1000/60;
@@ -98,11 +104,11 @@ public class Registers implements Hardware
       public void run()
       {
         if (dt > 0) dt--;
-        if (st > 0) {
-          soundChip.play();
+        if (st > 0 && soundChip.get() != null) {
+          soundChip.get().play();
           st--;
-        } else {
-          soundChip.stop();
+        } else if (soundChip.get() != null) {
+          soundChip.get().stop();
         }
       }
     }, TIMER_PERIOD, TIMER_PERIOD);

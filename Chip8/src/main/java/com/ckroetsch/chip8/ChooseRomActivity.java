@@ -2,7 +2,6 @@ package com.ckroetsch.chip8;
 
 import android.app.ListActivity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,13 +9,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import chip_8.Chip8Rom;
-import chip_8.RomFactory;
+import chip_8.android.RomFactory;
 
 
 public class ChooseRomActivity extends ListActivity {
@@ -29,7 +24,7 @@ public class ChooseRomActivity extends ListActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_choose_rom);
     ListAdapter adapter = new ArrayAdapter<String>(this, R.layout.rom_layout,
-            Chip8Application.getRomFactory().getRomNames());
+            RomFactory.get().getRomNames());
     setListAdapter(adapter);
   }
 
@@ -50,7 +45,8 @@ public class ChooseRomActivity extends ListActivity {
     // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
     if (id == R.id.action_settings) {
-        return true;
+      startActivity(new Intent(this, SettingsActivity.class));
+      return true;
     }
     return super.onOptionsItemSelected(item);
   }

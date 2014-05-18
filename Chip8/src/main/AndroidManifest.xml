@@ -23,6 +23,12 @@
             android:label="@string/title_activity_play_rom"
             android:theme="@style/FullscreenTheme" >
         </activity>
+        <activity
+            android:name="com.ckroetsch.chip8.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
     </application>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+
 </manifest>

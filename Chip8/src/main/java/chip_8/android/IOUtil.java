@@ -1,10 +1,10 @@
 package chip_8.android;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.ckroetsch.chip8.Chip8Application;
-import com.ckroetsch.chip8.R;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
@@ -44,9 +44,15 @@ public class IOUtil
     return Chip8Application.getContext().getResources().openRawResource(id);
   }
 
-  public static InputStream openRomConfig()
+  public static String getString(int id)
   {
-    return openRawResource(R.raw.rominfo);
+    return Chip8Application.getContext().getResources().getString(id);
+  }
+
+  public static int getPreferenceInt(int keyID, int defaultValue)
+  {
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Chip8Application.getContext());
+    return Integer.parseInt(prefs.getString(getString(keyID),defaultValue + ""));
   }
 
 }

@@ -19,11 +19,11 @@ public class Chip8Processor implements CPU
   public static final int PIXEL_WIDTH = 64;
   public static final int PIXEL_HEIGHT = 32;
 
-  private Registers reg = new Registers();
+  private Registers reg;
   private Keyboard keyboard;
-  private Memory memory = new Memory();
+  private Memory memory;
   private Collection<Hardware> componentList;
-  private BinaryBitmap bmap = BinaryBitmap.newBitmap1D(PIXEL_WIDTH,PIXEL_HEIGHT);
+  private BinaryBitmap bmap;
 
   // Use these to avoid annoying explicit casts in arithmetic
   public static final byte zero = 0;
@@ -35,7 +35,10 @@ public class Chip8Processor implements CPU
   {
     log.setMem(memory);
     log.setReg(reg);
-    componentList = Lists.newArrayList(reg,memory,bmap);
+    this.reg = new Registers();
+    this.memory = new Memory();
+    this.bmap = BinaryBitmap.newBitmap1D(PIXEL_WIDTH,PIXEL_HEIGHT);
+    this.componentList = Lists.newArrayList(reg,memory,bmap);
   }
 
   @Override
@@ -307,6 +310,8 @@ public class Chip8Processor implements CPU
   }
 
   public BinaryBitmap getBitmap() { return bmap; }
+
+  public Registers getRegisters() { return reg; }
 
   public Keyboard getKeyboard() { return keyboard; }
 }
