@@ -2,9 +2,6 @@ package chip_8;
 
 
 import Emulation.HardwareAdapter;
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.BitSet;
 
 

@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/controls"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom">
+    android:layout_height="match_parent">
 
     <Button
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_gravity="bottom"/>
+        android:layout_height="@dimen/button_height_small" />
 
-    <include
-        layout="@layout/controller3"
-        android:layout_gravity="bottom"/>
+    <include layout="@layout/controller2" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height_small" />
 
 </LinearLayout>

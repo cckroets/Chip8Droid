@@ -1,18 +1,12 @@
 package chip_8;
 
 
-import android.content.res.Resources;
 import android.util.Log;
-
 import Emulation.Hardware;
-
 import com.ckroetsch.chip8.Chip8Application;
 import com.ckroetsch.chip8.R;
-import com.google.common.io.Files;
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;

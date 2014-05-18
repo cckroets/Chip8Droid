@@ -4,10 +4,10 @@ package chip_8;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import android.content.Context;
-import com.ckroetsch.chip8.R;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import chip_8.android.IOUtil;
 
 
 /**
@@ -15,19 +15,17 @@ import org.json.JSONObject;
  */
 public class RomFactory
 {
-
-
   private Map<String,Chip8Rom> romConf;
 
-  public RomFactory(Context context)
+  public RomFactory()
   {
-    this.romConf = readRomConfig(context);
+    this.romConf = readRomConfig();
   }
 
-  private static Map<String,Chip8Rom> readRomConfig(Context c)
+  private static Map<String,Chip8Rom> readRomConfig()
   {
     Map<String,Chip8Rom> romMap = new HashMap<String, Chip8Rom>();
-    InputStream in = c.getResources().openRawResource(R.raw.rominfo);
+    InputStream in = IOUtil.openRomConfig();
     try {
         byte[] res = Utils.streamToBytes(in);
         String json = new String(res, "UTF-8");

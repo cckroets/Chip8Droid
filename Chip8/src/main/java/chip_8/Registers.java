@@ -1,10 +1,12 @@
 package chip_8;
 
 
+
 import Emulation.Hardware;
+import chip_8.android.BeepSoundChip;
+import chip_8.android.VibratorSoundChip;
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Timer;
@@ -36,6 +38,8 @@ public class Registers implements Hardware
 
   /* Sound Timer. Same as DT, but buzzes when non-zero */
   public int st;
+
+  private SoundChip soundChip = new BeepSoundChip();
 
   /* Timers work at 60Hz. Convert to ms. */
   private static int TIMER_PERIOD = 1000/60;
@@ -95,8 +99,10 @@ public class Registers implements Hardware
       {
         if (dt > 0) dt--;
         if (st > 0) {
-          // TODO: Play sound
+          soundChip.play();
           st--;
+        } else {
+          soundChip.stop();
         }
       }
     }, TIMER_PERIOD, TIMER_PERIOD);

@@ -5,8 +5,6 @@ import Emulation.CPU;
 import Emulation.Hardware;
 import Emulation.Rom;
 import com.google.common.collect.Lists;
-
-import java.security.Key;
 import java.util.Collection;
 
 

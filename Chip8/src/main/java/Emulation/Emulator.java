@@ -4,6 +4,9 @@ package Emulation;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -14,8 +17,9 @@ import java.io.IOException;
 public class Emulator implements Runnable, Hardware
 {
   private CPU cpu;
-  private volatile State state = State.START;
+  private AtomicReference<State> state = new AtomicReference<State>(State.START);
   private Rom currentRom;
+  private Set<ActionListener> actionListeners = new LinkedHashSet<ActionListener>();
 
   public Emulator(CPU cpu)
   {
@@ -48,18 +52,15 @@ public class Emulator implements Runnable, Hardware
   /**
    *  Request to pause the emulation
    */
-  public synchronized void pause()
+  public void pause()
   {
-    if (getState() == State.PAUSE)
-      resume();
-    else
-      changeState(State.PAUSE);
+    changeState(State.PAUSE);
   }
 
   /**
    *  Resume activity of the emulation
    */
-  public synchronized void resume()
+  public void resume()
   {
     changeState(State.PLAY);
   }
@@ -88,9 +89,22 @@ public class Emulator implements Runnable, Hardware
     changeState(State.SAVE);
   }
 
-  private synchronized void changeState(State newState)
+  /**
+   * Add an action listener to the emulator
+   * @param listener - The ActionListener to add
+   */
+  public void addActionListener(ActionListener listener)
   {
-    state = newState;
+    actionListeners.add(listener);
+  }
+
+  /**
+   * Change the state of the emulator
+   * @param newState the new state to go into
+   */
+  private void changeState(State newState)
+  {
+    state.set(newState);
   }
 
   /**
@@ -98,9 +112,9 @@ public class Emulator implements Runnable, Hardware
    * @return Current state
    * @see Emulation.Emulator.State
    */
-  private synchronized State getState()
+  private State getState()
   {
-    return state;
+    return state.get();
   }
 
   /**
@@ -150,7 +164,7 @@ public class Emulator implements Runnable, Hardware
 
 
   /** Reset all hardware components of the CPU
-   * e.g. Memory, Registers, Display, ...
+   * e.g. Memory, Registers, AndroidDisplay, ...
    */
   private void resetComponents()
   {
@@ -170,18 +184,30 @@ public class Emulator implements Runnable, Hardware
     } catch (IOException e) {
       e.printStackTrace();
     }
+    for (ActionListener listener : actionListeners) {
+      listener.onSave(currentRom);
+    }
     resume();
   }
 
   /* Load the CPU from previous state */
   @Override public void loadState(DataInput in)
   {
-    try {
-      for (Hardware hw : cpu.getHardwareComponents()) {
-        hw.loadState(in);
+    boolean saveFound;
+    if (in != null) {
+      try {
+        for (Hardware hw : cpu.getHardwareComponents()) {
+          hw.loadState(in);
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
       }
-    } catch (IOException e) {
-      e.printStackTrace();
+      saveFound = true;
+    } else {
+      saveFound = false;
+    }
+    for (ActionListener listener : actionListeners) {
+      listener.onLoad(currentRom, saveFound);
     }
     resume();
   }

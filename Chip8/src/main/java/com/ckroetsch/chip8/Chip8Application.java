@@ -3,11 +3,14 @@ package com.ckroetsch.chip8;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Vibrator;
 import android.view.WindowManager;
 
+import Emulation.ActionListener;
 import Emulation.Emulator;
 import chip_8.Chip8Processor;
 import chip_8.RomFactory;
+import chip_8.android.AndroidEmulatorListener;
 
 /**
  * Created by curtiskroetsch on 2014-05-15.
@@ -18,24 +21,18 @@ public class Chip8Application extends Application
   private static RomFactory factory;
   private static Emulator emulator;
   private static Chip8Processor cpu;
-
-  public static int SCREEN_WIDTH;
-  public static int SCREEN_HEIGHT;
+  private static Vibrator vibrator;
 
   @Override
   public void onCreate()
   {
     super.onCreate();
     context = this;
-    factory = new RomFactory(context);
+    vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+    factory = new RomFactory();
     cpu = new Chip8Processor();
     emulator = new Emulator(cpu);
-
-    WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    Point p = new Point();
-    windowManager.getDefaultDisplay().getSize(p);
-    SCREEN_WIDTH = p.x;
-    SCREEN_HEIGHT = p.y;
+    emulator.addActionListener(new AndroidEmulatorListener());
   }
 
   public static Context getContext()
@@ -56,5 +53,10 @@ public class Chip8Application extends Application
   public static Chip8Processor getCPU()
   {
     return cpu;
+  }
+
+  public static Vibrator getVibrator()
+  {
+    return vibrator;
   }
 }

@@ -28,8 +28,8 @@ public class ChooseRomActivity extends ListActivity {
   {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_choose_rom);
-    RomFactory factory = new RomFactory(this);
-    ListAdapter adapter = new ArrayAdapter<String>(this, R.layout.rom_layout, factory.getRomNames());
+    ListAdapter adapter = new ArrayAdapter<String>(this, R.layout.rom_layout,
+            Chip8Application.getRomFactory().getRomNames());
     setListAdapter(adapter);
   }
 
