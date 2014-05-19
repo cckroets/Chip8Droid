@@ -22,7 +22,6 @@ public class Utils
   {
     byte[] result = new byte[in.available()];
     ByteStreams.readFully(in, result);
-    Log.d("UTIL", "result=" + result);
     return result;
   }
 }
